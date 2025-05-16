@@ -1,0 +1,10 @@
+nav.bg-white {
+    margin-left: 250px; /* Deja espacio para el menú lateral */
+    width: calc(100% - 250px); /* Ajusta el ancho restante */
+    transition: margin-left 0.3s, width 0.3s; /* Suaviza los cambios */
+}
+
+nav.bg-white .max-w-7xl {
+    max-width: 100%; /* Asegura que el contenido se ajuste al nuevo ancho */
+    background-size: contain;
+}
