@@ -11,15 +11,43 @@ use Illuminate\Support\Facades\Storage; // Importa la fachada Storage
 
 class ProductoController extends Controller
 {
-    public function index()
-    {
-        $productos = Producto::with(['categoria', 'multimedia'])->get();
-        return view('productos.index', compact('productos'));
+    public function index(Request $request)
+{
+    $query = Producto::with(['categoria', 'multimedia']);
+
+    if ($request->filled('nombre')) {
+        $query->where('nombre', 'like', '%' . $request->nombre . '%');
     }
+
+    if ($request->filled('id_categoria')) {
+        $query->where('id_categoria', $request->id_categoria);
+    }
+
+    if ($request->filled('precio_min')) {
+        $query->where('precio', '>=', $request->precio_min);
+    }
+
+    if ($request->filled('precio_max')) {
+        $query->where('precio', '<=', $request->precio_max);
+    }
+
+    if ($request->filled('fecha')) {
+        $query->whereDate('fecha', $request->fecha);
+    }
+    
+
+    $productos = $query->get();
+    $categorias = Categoria::all();
+    $productos = $query->paginate(10)->appends($request->query());
+
+
+    return view('productos.index', compact('productos', 'categorias'));
+}
+
 
     public function create()
     {
-        $categorias = Categoria::all();
+        $categorias = Categoria::where('estado', true)->get(); // solo activas
         $multimedia = Multimedia::all();  // Obtén todas las imágenes multimedia
         return view('productos.create', compact('categorias', 'multimedia'));
     }
@@ -33,7 +61,15 @@ class ProductoController extends Controller
             'id_categoria' => 'required|exists:categorias,id',
             'id_multimedia' => 'required|exists:multimedia,id',  // Verifica que la imagen exista
             'fecha' => 'required|date',  // Asegúrate de que la fecha esté presente
-        ]);
+        ]);// Verifica si la categoría está activa
+        $categoria = Categoria::findOrFail($request->id_categoria);
+    
+        if (!$categoria->estado) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'No puedes crear un producto en una categoría desactivada.');
+        }
+
 
         // Crear el producto con los datos validados
         Producto::create([
@@ -108,6 +144,32 @@ class ProductoController extends Controller
 
     return response()->json(['precio' => $producto->precio]);
 }
+public function toggleEstado(Producto $producto)
+{
+    
+
+    // Verificar si se intenta activar
+    if (!$producto->estado) {
+        if (!$producto->categoria || !$producto->categoria->estado) {
+            return redirect()->back()->with('error', 'Debe activar la categoría antes de activar este producto.');
+        }
+    }
+    $producto->estado = !$producto->estado;
+    $producto->save();
+
+    return redirect()->route('productos.index')->with('success', 'Estado del producto actualizado.');
+}
+public function storeMultiple(Request $request)
+{
+    $productos = $request->input('productos');
+
+    foreach ($productos as $producto) {
+        Producto::create($producto);
+    }
+
+    return redirect()->route('productos.index')->with('success', 'Productos guardados exitosamente.');
+}
+
 
 }
 

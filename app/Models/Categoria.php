@@ -12,7 +12,7 @@ class Categoria extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nombre']; // Asegúrate de proteger los campos que se pueden asignar masivamente.
+    protected $fillable = ['nombre', 'estado']; // Asegúrate de proteger los campos que se pueden asignar masivamente.
     
     public function productos()
     {

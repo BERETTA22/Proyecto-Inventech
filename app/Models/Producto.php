@@ -19,6 +19,7 @@ class Producto extends Model
         'id_categoria',
         'id_multimedia',
         'fecha',
+        'estado' // Agrega el campo estado
     ];
     public function categoria()
     {

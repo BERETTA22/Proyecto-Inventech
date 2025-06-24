@@ -59,6 +59,8 @@ Route::post('/categorias', [CategoriaController::class, 'store'])->name('categor
 Route::delete('/categorias/{id}', [CategoriaController::class, 'destroy'])->name('categorias.destroy');
 Route::get('/categorias/{id}/edit', [CategoriaController::class, 'edit'])->name('categorias.edit');
 Route::put('/categorias/{id}', [CategoriaController::class, 'update'])->name('categorias.update');
+Route::patch('/categorias/{id}/toggle', [CategoriaController::class, 'toggleEstado'])->name('categorias.toggleEstado');
+
 
 // Rutas para Multimedia
 Route::get('/multimedia', [MultimediaController::class, 'index'])->name('multimedia.index');
@@ -73,6 +75,10 @@ Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('
 Route::resource('productos', ProductoController::class);
 Route::put('productos/{producto}', [ProductoController::class, 'update'])->name('productos.update');
 Route::get('/productos/{id}/precio', [ProductoController::class, 'obtenerPrecio']);
+Route::patch('/productos/{producto}/toggle-estado', [ProductoController::class, 'toggleEstado'])->name('productos.toggleEstado');
+Route::post('/productos/multiple', [ProductoController::class, 'storeMultiple'])->name('productos.storeMultiple');
+
+
 
 
 // Rutas para Tiendas

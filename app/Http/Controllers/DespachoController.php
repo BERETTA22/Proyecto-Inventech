@@ -34,7 +34,8 @@ class DespachoController extends Controller
     {
         $tiendas = Tienda::all();
         $sucursales = $request->filled('tienda') ? Sucursal::where('tienda_id', $request->tienda)->get() : collect();
-        $productos = Producto::with('categoria')->get();
+        $productos = Producto::with('categoria')->where('estado', 1)->get();
+        // Asegúrate de que solo se muestren productos activo
         $empleados = User::where('role_id', 2)->get();
     
         return view('despachos.create', compact('tiendas', 'sucursales', 'productos', 'empleados'));
@@ -54,6 +55,13 @@ class DespachoController extends Controller
             'productos.*.precio_unitario' => 'required|numeric|min:0',
             'empleado_id' => 'required|exists:users,id',
         ]);
+        // Aquí se hace la validación de estado de los productos
+    foreach ($validated['productos'] as $productoItem) {
+        $producto = Producto::find($productoItem['id']);
+        if (!$producto || !$producto->estado) {
+            return back()->with('error', 'El producto "' . $producto->nombre . '" está inactivo y no puede ser despachado.');
+        }
+    }
 
         $cantidadTotal = collect($request->productos)->sum('cantidad');
         $precioTotal = collect($request->productos)->sum(fn($producto) => $producto['cantidad'] * $producto['precio_unitario']);

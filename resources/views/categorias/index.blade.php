@@ -1,13 +1,3 @@
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function() {
-        // Evitar espacios iniciales en el input de nombre de categoría
-        $(document).on('input', '#nombre_categoria', function() {
-            let value = $(this).val();
-            $(this).val(value.replace(/^\s+/, '')); // Eliminar espacios iniciales
-        });
-    });
-</script>
 @extends('layouts.app')
 
 @section('title', 'Lista de Categorías')
@@ -40,25 +30,33 @@
                 <thead>
                     <tr class="bg-[#2c3e50] text-white">
                         <th class="px-6 py-2">#</th>
-                        <th class="px-6 py-2">Categorías</th>
+                        <th class="px-6 py-2">Categoría</th>
                         <th class="px-6 py-2">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($categorias as $index => $categoria)
                     <tr class="border-t hover:bg-gray-50">
-                        <td class="px-6 py-2">{{ $index + 1 }}</td>
-                        <td class="px-6 py-2">{{ $categoria->nombre }}</td>
-                        <td class="px-6 py-2 flex space-x-3 justify-center">
-                            <!-- Botón Editar -->
-                            <a href="{{ route('categorias.edit', $categoria->id) }}" class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                Editar
-                            </a>
-                            <!-- Botón Eliminar -->
-                            <form action="{{ route('categorias.destroy', $categoria->id) }}" method="POST" onsubmit="return confirm('¿Estás seguro de eliminar esta categoría?')">
-                               
+                        <td class="px-6 py-3 text-center">{{ $index + 1 }}</td>
+                        <td class="px-6 py-3">{{ $categoria->nombre }}</td>
+                        <td class="px-6 py-3">
+                            <div class="flex justify-center space-x-2">
+                                <!-- Botón Editar -->
+                                <a href="{{ route('categorias.edit', $categoria->id) }}"
+                                   class="bg-blue-500 text-white px-4 py-1 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    Editar
+                                </a>
 
-                            </form>
+                                <!-- Botón Activar/Desactivar -->
+                                <form action="{{ route('categorias.toggleEstado', $categoria->id) }}" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit"
+                                            class="px-4 py-1 rounded text-white {{ $categoria->estado ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600' }}">
+                                        {{ $categoria->estado ? 'Desactivar' : 'Activar' }}
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     @endforeach
@@ -68,4 +66,17 @@
 
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Evitar espacios iniciales en el input de nombre de categoría
+        $(document).on('input', '#nombre_categoria', function() {
+            let value = $(this).val();
+            $(this).val(value.replace(/^\s+/, ''));
+        });
+    });
+</script>
 @endsection

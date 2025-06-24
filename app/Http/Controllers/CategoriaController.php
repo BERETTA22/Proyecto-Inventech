@@ -54,6 +54,21 @@ public function destroy($id)
     Categoria::destroy($id);
     return redirect()->route('categorias.index');
 }
+public function toggleEstado($id)
+{
+    $categoria = Categoria::findOrFail($id);
+
+    // Cambiar el estado
+    $nuevoEstado = !$categoria->estado;
+    $categoria->estado = $nuevoEstado;
+    $categoria->save();
+
+    // Desactivar o activar productos asociados
+    $categoria->productos()->update(['estado' => $nuevoEstado]);
+
+    return redirect()->route('categorias.index')->with('success', 'Estado de la categoría y sus productos actualizado.');
+}
+
 
 }
 
