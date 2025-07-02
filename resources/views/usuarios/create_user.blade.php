@@ -1,12 +1,57 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function() {
+         // Validar antes de enviar
+        $('form').on('submit', function (e) {
+            const name = $('#name').val().trim();
+            const username = $('#username').val().trim();
+            const email = $('#email').val().trim();
+            const password = $('#password').val();
+            const passwordConfirmation = $('#password_confirmation').val();
+
+            // Expresiones regulares
+            const nameRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{2,255}$/;
+            const usernameRegex = /^(?=.*[A-Za-z])[A-Za-z0-9_]{4,255}$/;
+            const emailRegex = /^[\w\.-]+@[\w\.-]+\.(com)$/i;
+
+            // Validaciones
+            if (!nameRegex.test(name)) {
+                alert('El nombre debe tener solo letras (mínimo 2 caracteres).');
+                e.preventDefault();
+                return;
+            }
+
+            if (!usernameRegex.test(username)) {
+                alert('El username debe tener letras y puede incluir números o guiones bajos (mínimo 4 caracteres).');
+                e.preventDefault();
+                return;
+            }
+
+            if (!emailRegex.test(email)) {
+                alert('El correo debe ser válido y terminar en .com.');
+                e.preventDefault();
+                return;
+            }
+
+            if (password.length < 8) {
+                alert('La contraseña debe tener al menos 8 caracteres.');
+                e.preventDefault();
+                return;
+            }
+
+            if (password !== passwordConfirmation) {
+                alert('Las contraseñas no coinciden.');
+                e.preventDefault();
+                return;
+            }
+        });
+    });
         // Evitar espacios iniciales en los inputs
         $(document).on('input', 'input, textarea', function() {
             let value = $(this).val();
             $(this).val(value.replace(/^\s+/, '')); // Eliminar espacios iniciales
         });
-    });
+
 </script>
 @extends('layouts.app')
 

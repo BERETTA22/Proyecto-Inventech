@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Categoria;
 use App\Models\Producto;
 use App\Models\Despacho;
+use App\Models\Tienda;
 
 class DashboardController extends Controller
 {
@@ -22,6 +23,7 @@ class DashboardController extends Controller
         $userCount = User::count(); // Total de usuarios
         $categoryCount = Categoria::count(); // Total de categorías
         $productCount = Producto::count(); // Total de productos
+        $tiendaCount = Tienda::count(); // Total de tiendas
 
         // Productos más despachados
         $productosMasDespachados = DB::table('producto_despacho')
@@ -56,7 +58,8 @@ class DashboardController extends Controller
             'categoryCount',
             'productCount',
             'productosMasDespachados',
-            'ultimosDespachos'
+            'ultimosDespachos',
+            'tiendaCount'
         ));
     }
 

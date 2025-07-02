@@ -23,9 +23,22 @@ class CategoriaController extends Controller
     // Almacenar una nueva categoría
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required|max:255', // Validación para el nombre
-        ]);
+    $request->validate([
+    'nombre' => [
+        'required',
+        'string',
+        'max:255',
+        'min:2',
+        'unique:categorias,nombre',
+        // Debe contener al menos una letra y permitir letras, números, espacios y caracteres especiales comunes
+        'regex:/^(?=.*[\pL])[ \pL\pN.,()\-]{2,255}$/u',
+    ]
+], [
+    'nombre.regex' => 'El nombre debe tener al menos una letra y puede contener números o símbolos, pero no ser solo un carácter, solo números o solo símbolos.',
+    'nombre.unique' => 'Esa categoría ya existe.',
+]);
+
+
 
         Categoria::create([
             'nombre' => $request->nombre, // Creamos la nueva categoría

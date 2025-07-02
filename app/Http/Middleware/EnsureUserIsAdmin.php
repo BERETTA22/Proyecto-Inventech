@@ -10,7 +10,7 @@ class EnsureUserIsAdmin
     public function handle(Request $request, Closure $next)
     {
         // Verificar si el usuario está autenticado y es administrador (role_id = 1)
-        if (Auth::check() && Auth::user()->role_id == 1) {
+        if (Auth::check() && Auth::user()->role_id === 1) {
             return $next($request); // Permitir acceso
         }
 

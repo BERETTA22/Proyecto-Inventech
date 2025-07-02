@@ -86,39 +86,78 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    let productoIndex = 1;
+let productoIndex = 1;
 
-    $(document).ready(function () {
-        // Evitar espacios iniciales
-        $(document).on('input', 'input, textarea', function () {
-            let value = $(this).val();
-            $(this).val(value.replace(/^\s+/, ''));
-        });
-
-        // Agregar nuevo producto
-        $('#agregar-producto').click(function (e) {
-            e.preventDefault();
-
-            let nuevoProducto = $('.producto-group').first().clone();
-
-            nuevoProducto.find('input, select').each(function () {
-                let name = $(this).attr('name');
-                if (name) {
-                    let nuevoName = name.replace(/\[\d+\]/, `[${productoIndex}]`);
-                    $(this).attr('name', nuevoName);
-                    $(this).val('');
-                }
-            });
-
-            nuevoProducto.find('.eliminar-producto').removeClass('hidden');
-            $('#productos-container').append(nuevoProducto);
-            productoIndex++;
-        });
-
-        // Eliminar grupo de producto
-        $(document).on('click', '.eliminar-producto', function () {
-            $(this).closest('.producto-group').remove();
-        });
+$(document).ready(function () {
+    // Evitar espacios iniciales
+    $(document).on('input', 'input, textarea', function () {
+        let value = $(this).val();
+        $(this).val(value.replace(/^\s+/, ''));
     });
+
+    // Agregar nuevo producto
+    $('#agregar-producto').click(function (e) {
+        e.preventDefault();
+
+        let nuevoProducto = $('.producto-group').first().clone();
+
+        nuevoProducto.find('input, select').each(function () {
+            let name = $(this).attr('name');
+            if (name) {
+                let nuevoName = name.replace(/\[\d+\]/, `[${productoIndex}]`);
+                $(this).attr('name', nuevoName);
+                $(this).val('');
+            }
+        });
+
+        nuevoProducto.find('.eliminar-producto').removeClass('hidden');
+        $('#productos-container').append(nuevoProducto);
+        productoIndex++;
+    });
+
+    // Eliminar grupo de producto
+    $(document).on('click', '.eliminar-producto', function () {
+        $(this).closest('.producto-group').remove();
+    });
+
+    // Validación antes de enviar el formulario
+    $('form').on('submit', function (e) {
+        const nombres = [];
+        let valido = true;
+        let errores = [];
+
+        $('.producto-group').each(function (i) {
+            const nombre = $(this).find('input[name$="[nombre]"]').val().trim();
+
+            if (nombre === '') {
+                errores.push(`Producto ${i + 1}: El nombre no puede estar vacío.`);
+                valido = false;
+            }
+
+            if (/^[\s.]+$/.test(nombre)) {
+                errores.push(`Producto ${i + 1}: El nombre no puede ser solo puntos o espacios.`);
+                valido = false;
+            }
+
+            if (!/[a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(nombre)) {
+                errores.push(`Producto ${i + 1}: El nombre debe contener al menos una letra.`);
+                valido = false;
+            }
+
+            if (nombres.includes(nombre.toLowerCase())) {
+                errores.push(`Producto ${i + 1}: El nombre "${nombre}" ya se repitió.`);
+                valido = false;
+            }
+
+            nombres.push(nombre.toLowerCase());
+        });
+
+        if (!valido) {
+            e.preventDefault();
+            alert(errores.join('\n'));
+        }
+    });
+});
 </script>
+
 @endsection

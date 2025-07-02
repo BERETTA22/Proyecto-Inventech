@@ -15,7 +15,8 @@
             <div class="flex items-center space-x-4">
                 <input 
                     type="file" 
-                    name="file" 
+                    name="file[]" 
+                    multiple
                     class="block w-full text-sm text-gray-700 border border-gray-300 rounded-md focus:ring focus:ring-blue-300 focus:outline-none" 
                     required>
                 <button 

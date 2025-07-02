@@ -136,6 +136,11 @@
     });
     
 </script>
+@if (session('error'))
+    <div class="bg-red-100 text-red-700 px-4 py-2 rounded mb-4">
+        {{ session('error') }}
+    </div>
+@endif
 
 <!-- Formulario de despacho -->
 <form action="{{ route('despachos.store') }}" method="POST" class="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
@@ -235,5 +240,7 @@
         </button>
     </div>
 </form>
+
+
 
 @endsection

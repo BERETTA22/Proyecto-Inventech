@@ -47,6 +47,8 @@ Route::middleware('auth')->group(function () {
 
 // Rutas para Usuarios
 Route::get('/usuarios', [AddUserController::class, 'index'])->name('usuarios.ver_usuarios');
+Route::get('/usuarios-api', [\App\Http\Controllers\UsuarioApiController::class, 'index']);
+
 Route::get('/usuarios/create', [AddUserController::class, 'create'])->name('usuarios.create');
 Route::post('/usuarios/store', [AddUserController::class, 'store'])->name('usuarios.store');
 Route::get('/usuarios/{id}/edit', [AddUserController::class, 'edit'])->name('usuarios.edit');
@@ -83,6 +85,8 @@ Route::post('/productos/multiple', [ProductoController::class, 'storeMultiple'])
 
 // Rutas para Tiendas
 Route::resource('tiendas', TiendaController::class);
+Route::patch('/tiendas/{tienda}/toggle-estado', [TiendaController::class, 'toggleEstado'])->name('tiendas.toggleEstado');
+
 
 
 // Rutas para manejar las sucursales de una tienda
@@ -92,6 +96,10 @@ Route::post('/sucursales', [SucursalController::class, 'store'])->name('sucursal
 Route::get('/sucursales/{sucursal}/edit', [SucursalController::class, 'edit'])->name('sucursales.edit');
 Route::put('/sucursales/{sucursal}', [SucursalController::class, 'update'])->name('sucursales.update');
 Route::delete('/sucursales/{sucursal}', [SucursalController::class, 'destroy'])->name('sucursales.destroy');
+Route::post('/sucursales/multiple', [SucursalController::class, 'storeMultiple'])->name('sucursales.storeMultiple');
+Route::patch('/sucursales/{sucursal}/toggle-estado', [SucursalController::class, 'toggleEstado'])->name('sucursales.toggleEstado');
+
+
 
 // Ruta para obtener sucursales por tienda, debe ir después de las demás rutas de sucursales
 Route::get('/sucursales/{tienda_id}', [DespachoController::class, 'getSucursalesByTienda'])->name('sucursales.getSucursalesByTienda');

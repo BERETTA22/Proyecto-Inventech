@@ -44,12 +44,17 @@ class AddUserController extends Controller
     {
         // Validar los datos del formulario
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'unique:users,username'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'exists:roles,id'], // Validar que el rol existe
-        ]);
+    'name'     => ['required', 'string', 'max:255', 'regex:/^[A-Za-zÁÉÍÓÚáéíóúñÑ ]{2,}$/'],
+    'username' => ['required', 'string', 'max:255', 'unique:users,username', 'regex:/^(?=.*[A-Za-z])[A-Za-z0-9_]{4,}$/'],
+    'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email', 'regex:/^[\w\.-]+@[\w\.-]+\.com$/'],
+    'password' => ['required', 'confirmed', Rules\Password::defaults()],
+    'role'     => ['required', 'exists:roles,id'],
+], [
+    'name.regex'     => 'El nombre solo puede contener letras y espacios, mínimo 2 caracteres.',
+    'username.regex' => 'El username debe tener letras y puede incluir números o guiones bajos.',
+    'email.regex'    => 'El correo debe ser válido y terminar en ".com".'
+]);
+
 
         // Crear el usuario con el rol seleccionado
         $user = User::create([

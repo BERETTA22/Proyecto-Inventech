@@ -18,42 +18,44 @@ class MultimediaController extends Controller
     }
 
     /**
-     * Almacenar un archivo nuevo.
+     * Almacenar uno o varios archivos nuevos.
      */
     public function store(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:jpg,jpeg,png,gif,webp|max:2048', // Tamaño máximo de 2 MB
+            'file' => 'required',
+            'file.*' => 'mimes:jpg,jpeg,png,gif,webp,mp4,webm,ogg,mp3,wav|max:10240' // 10 MB por archivo
         ]);
-    
-        $file = $request->file('file');
-    
-        $filename = time() . '_' . $file->getClientOriginalName();
-        $path = $file->storeAs('multimedia', $filename, 'public'); // Guarda el archivo con el nombre original
-        
-    
-        // Crear el registro en la base de datos
-        Multimedia::create([
-            'nombre_archivo' => $file->getClientOriginalName(), // Nombre original
-            'tipo_archivo' => $path, // Guarda solo el path relativo
-        ]);
-    
-        return redirect()->back()->with('success', 'Archivo subido correctamente.');
+
+        if ($request->hasFile('file')) {
+            foreach ($request->file('file') as $archivo) {
+                $filename = time() . '_' . $archivo->getClientOriginalName();
+                $path = $archivo->storeAs('multimedia', $filename, 'public');
+
+                Multimedia::create([
+                    'nombre_archivo' => $archivo->getClientOriginalName(),
+                    'tipo_archivo'   => $path,
+                ]);
+            }
+
+            return redirect()->back()->with('success', 'Archivos subidos correctamente.');
+        }
+
+        return redirect()->back()->with('error', 'No se subió ningún archivo.');
     }
-    
 
     /**
      * Eliminar un archivo.
      */
     public function destroy($id)
     {
-        $file = Multimedia::findOrFail($id); // Encuentra el registro
+        $file = Multimedia::findOrFail($id);
 
-        // Eliminar el archivo físico
-        $path = str_replace('/storage/', 'public/', $file->tipo_archivo); // Ajustar el path
+        // Eliminar archivo físico
+        $path = str_replace('/storage/', 'public/', $file->tipo_archivo);
         Storage::delete($path);
 
-        // Eliminar el registro de la base de datos
+        // Eliminar de la base de datos
         $file->delete();
 
         return redirect()->back()->with('success', 'Archivo eliminado correctamente.');

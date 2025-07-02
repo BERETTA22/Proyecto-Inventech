@@ -55,6 +55,10 @@ class DespachoController extends Controller
             'productos.*.precio_unitario' => 'required|numeric|min:0',
             'empleado_id' => 'required|exists:users,id',
         ]);
+            // ✅ Verificar si la tienda está activa
+    $tienda = Tienda::find($validated['tienda']);
+    if (!$tienda || !$tienda->estado) {
+        return back()->with('error', 'La tienda "' . $tienda->nombre . '" está desactivada. Actívala para poder crear un despacho.')->withInput();}
         // Aquí se hace la validación de estado de los productos
     foreach ($validated['productos'] as $productoItem) {
         $producto = Producto::find($productoItem['id']);

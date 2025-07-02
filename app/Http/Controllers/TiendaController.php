@@ -61,4 +61,18 @@ class TiendaController extends Controller
 
         return redirect()->route('tiendas.index')->with('success', 'Tienda eliminada exitosamente.');
     }
+public function toggleEstado(Tienda $tienda)
+{
+    // Cambiar el estado de la tienda (true ↔ false)
+    $nuevoEstado = !$tienda->estado;
+    $tienda->estado = $nuevoEstado;
+    $tienda->save();
+
+    // También actualizar el estado de todas las sucursales de la tienda
+    $tienda->sucursales()->update(['estado' => $nuevoEstado]);
+
+    return redirect()->back()->with('success', 'La tienda y sus sucursales fueron ' . ($nuevoEstado ? 'activadas' : 'desactivadas') . ' correctamente.');
+}
+
+
 }

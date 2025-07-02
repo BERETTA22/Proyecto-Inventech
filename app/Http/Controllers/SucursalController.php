@@ -94,6 +94,36 @@ class SucursalController extends Controller
         return response()->json($sucursales);
     }
     
+public function storeMultiple(Request $request)
+{
+    $data = $request->input('sucursales');
+
+    foreach ($data as $sucursal) {
+        \App\Models\Sucursal::create([
+            'tienda_id' => $sucursal['tienda_id'],
+            'nombre_sucursal' => $sucursal['nombre_sucursal'],
+            'direccion' => $sucursal['direccion'],
+            'contacto' => $sucursal['contacto'] ?? null,
+        ]);
+    }
+
+    return redirect()->route('sucursales.index')->with('success', 'Sucursales creadas exitosamente.');
+}
+public function toggleEstado($id)
+{
+    $sucursal = \App\Models\Sucursal::with('tienda')->findOrFail($id);
+
+    // Si se va a activar la sucursal y su tienda está desactivada
+    if (!$sucursal->estado && !$sucursal->tienda->estado) {
+        return redirect()->back()->with('error', 'No se puede activar esta sucursal porque la tienda "' . $sucursal->tienda->nombre . '" está desactivada.');
+    }
+
+    $sucursal->estado = !$sucursal->estado;
+    $sucursal->save();
+
+    return redirect()->back()->with('success', 'Estado de la sucursal actualizado correctamente.');
+}
+
 
     
 }

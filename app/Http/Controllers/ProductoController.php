@@ -163,13 +163,41 @@ public function storeMultiple(Request $request)
 {
     $productos = $request->input('productos');
 
-    foreach ($productos as $producto) {
+    foreach ($productos as $index => $producto) {
+        $validator = \Validator::make($producto, [
+            'nombre' => [
+                'required',
+                'string',
+                'min:2',
+                'max:255',
+                'unique:productos,nombre',
+                'regex:/^(?![\s.]*$)(?=.*[a-zA-Z])[a-zA-Z0-9\s\.\,\-\_\(\)áéíóúÁÉÍÓÚñÑ]+$/'
+            ],
+            'cantidad' => 'required|integer|min:1',
+            'precio' => 'required|numeric|min:0.01',
+            'id_categoria' => 'required|exists:categorias,id',
+            'id_multimedia' => 'required|exists:multimedia,id',
+            'fecha' => 'required|date',
+        ], [
+            'nombre.required' => "El nombre del producto es obligatorio.",
+            'nombre.unique' => "Ya existe un producto con ese nombre.",
+            'nombre.regex' => "El nombre debe contener letras y no ser solo números o símbolos.",
+            'cantidad.required' => "La cantidad es obligatoria.",
+            'precio.required' => "El precio es obligatorio.",
+            'id_categoria.required' => "Debe seleccionar una categoría válida.",
+            'id_multimedia.required' => "Debe seleccionar una imagen válida.",
+            'fecha.required' => "La fecha es obligatoria.",
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
         Producto::create($producto);
     }
 
     return redirect()->route('productos.index')->with('success', 'Productos guardados exitosamente.');
 }
-
-
 }
-
